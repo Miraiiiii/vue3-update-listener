@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-02-22 10:04:29
+ * @LastEditTime: 2024-02-28 16:31:46
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -29,13 +29,15 @@ const ListenVersion = {
     let currebtVersion
     let setInterValId
     let isUpdate = false
+    let isStop = false
 
     // 获取版本信息
     const getVersion = async () => {
       return fetch(`${options.versionUrl || '/dist'}/version.json?timeStamp=` + Date.now()).then(res => {
         return res.json()
       }).catch(err => {
-        console.log(err)
+        console.warn('获取version.json文件失败，请检查路径是否正确')
+        isStop = true
       })
     }
 
@@ -56,7 +58,7 @@ const ListenVersion = {
 
     // 开始检查更新
     const startListen = async () => {
-      if (!options.showTest && (options.isTip === false || process.env.NODE_ENV === 'development')) return
+      if (!options.showTest && (options.isTip === false || process.env.NODE_ENV === 'development' || isStop)) return
       const versionInfo = await getVersion()
       if (!versionInfo || isUpdate) return
       currebtVersion = versionInfo.commitHash
