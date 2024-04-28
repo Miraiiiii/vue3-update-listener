@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-02-28 16:31:46
+ * @LastEditTime: 2024-04-28 18:40:35
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -21,6 +21,7 @@ import { openConfirm } from './components/confirm/confirm'
  * @param {Element} options.modalProps.mountedEl 弹窗挂载节点，默认为body
  * @param {String} options.type 弹窗样式类型，默认为'qingmu', 可选值为'element'、'qingmu'、'custom'(暂不支持)
  * @param {Boolean} options.showTest 弹窗常显测试
+ * @param {Boolean} options.refreshSameOrigin 是否刷新同源页面，默认为true
  * @returns {Void} 无返回值
  */
 
@@ -30,6 +31,15 @@ const ListenVersion = {
     let setInterValId
     let isUpdate = false
     let isStop = false
+
+    if (options.refreshSameOrigin) {
+      window.addEventListener('storage', function(event) {
+        if (event.key === 'refreshPage' && event.newValue === 'true') {
+          localStorage.removeItem('refreshPage')
+          window.location.reload()
+        }
+      })
+    }
 
     // 获取版本信息
     const getVersion = async () => {
@@ -44,6 +54,7 @@ const ListenVersion = {
     // 检查是否有新版本
     const checkUpdate = async () => {
       const commitHash = (await getVersion()).commitHash
+      console.log('当前版本：', commitHash)
       return commitHash !== currebtVersion
     }
 
@@ -56,22 +67,28 @@ const ListenVersion = {
       }
     }
 
+    const handleListen = async (versionInfo) => {
+      isUpdate = options.showTest || (await checkUpdate())
+      // 判断versionInfo.message是否有--no-tip字符，如果有则不提示更新
+      if ((isUpdate && versionInfo.isTip) || options.showTest) {
+        console.log('有新版本')
+        stopUpdate()
+        await callConfirm()
+      }
+    }
+
     // 开始检查更新
-    const startListen = async () => {
-      if (!options.showTest && (options.isTip === false || process.env.NODE_ENV === 'development' || isStop)) return
+    const startListen = async (immediate = false) => {
+      if (!options.showTest && (options.isTip === false || isStop)) return
       const versionInfo = await getVersion()
       if (!versionInfo || isUpdate) return
-      currebtVersion = versionInfo.commitHash
+      if (!immediate) {
+        currebtVersion = versionInfo.commitHash
+        console.log('当前版本：', currebtVersion)
+      }
+      immediate && await handleListen(versionInfo)
       console.log('开始检查更新')
-      setInterValId = setInterval(async () => {
-        isUpdate = options.showTest || (await checkUpdate())
-        // 判断versionInfo.message是否有--no-tip字符，如果有则不提示更新
-        if ((isUpdate && versionInfo.isTip) || options.showTest) {
-          console.log('有新版本')
-          stopUpdate()
-          await callConfirm()
-        }
-      }, options.interval || 5 * 60 * 1000)
+      setInterValId = setInterval(async () => (await handleListen(versionInfo)), options.interval || 5 * 60 * 1000)
     }
 
     const callConfirm = async () => {
@@ -81,7 +98,12 @@ const ListenVersion = {
           content: hasContent ? options.modalProps.content : '为了更好的版本体验请更新到最新版本',
           type: options.type || 'qingmu',
         }, options.modalProps && options.modalProps.mountedEl)
-        window.location.reload()
+        if (options.refreshSameOrigin) {
+          localStorage.setItem('refreshPage', 'true')
+          window.location.reload()
+        } else {
+          window.location.reload()
+        }
       } catch (error) {
         console.log(error)
       }
@@ -91,14 +113,16 @@ const ListenVersion = {
       if (document.hidden) {
         stopUpdate()
       } else {
-        startListen()
+        startListen(true)
       }
     }
 
     document.addEventListener('visibilitychange', listenPageVisible)
 
     const listenJSError = async (event) => {
-      if (event.target.nodeName === 'SCRIPT') {
+      if (event.target && event.target.nodeName === 'SCRIPT') {
+        const scriptUrl = event.target.src
+        console.error('Failed to load script: ' + scriptUrl)
         stopUpdate()
         await callConfirm()
       }

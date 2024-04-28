@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-02-27 18:19:56
  * @LastEditors: 舌红
- * @LastEditTime: 2024-02-27 18:22:01
+ * @LastEditTime: 2024-04-28 14:03:18
  */
 const { defineConfig } = require('@vue/cli-service')
 
@@ -13,19 +13,13 @@ module.exports = defineConfig({
   publicPath: './',
   outputDir: 'lib',
   assetsDir: 'static',
-  pages: {
-    index: {
-      // page 的入口
-      entry: 'examples/main.js',
-      // 模板来源
-      template: 'public/index.html',
-      // 输出文件名
-      filename: 'index.html'
-    }
-  },
   configureWebpack: {
+    entry: './packages/index.js',
     output: {
-      filename: `[name].${timeStamp}.js`
+      library: 'vue3-update-listener',
+      libraryTarget: 'umd',
+      umdNamedDefine: true,
+      globalObject: 'this'
     }
   }
 })
