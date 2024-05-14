@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-04-28 18:40:35
+ * @LastEditTime: 2024-05-13 11:08:34
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -93,6 +93,8 @@ const ListenVersion = {
 
     const callConfirm = async () => {
       try {
+        const modalElement = document.querySelector('.confirm-mask.update-confirm-loader')
+        if (modalElement) return
         const hasContent = options.modalProps && options.modalProps.content
         await openConfirm({
           content: hasContent ? options.modalProps.content : '为了更好的版本体验请更新到最新版本',
