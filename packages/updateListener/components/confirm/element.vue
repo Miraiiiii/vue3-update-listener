@@ -3,10 +3,10 @@
  * @Author: 舌红
  * @Date: 2024-01-10 17:01:44
  * @LastEditors: 舌红
- * @LastEditTime: 2024-02-23 14:44:12
+ * @LastEditTime: 2024-08-21 16:07:22
 -->
 <template>
-  <ConfirmMask>
+  <ConfirmMask :z-index="zIndex">
     <div class="confirm-element__wrapper">
       <div class="confirm-element__header">
         <div class="confirm-element__title">

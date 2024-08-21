@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-02-27 18:26:15
  * @LastEditors: 舌红
- * @LastEditTime: 2024-02-27 18:53:45
+ * @LastEditTime: 2024-08-21 16:06:15
  */
 
 /**
@@ -17,12 +17,26 @@
 // import Vue from 'vue'
 import { createVNode, render } from 'vue'
 
+function getMaxZIndex() {
+  let maxZ = 0
+  const elements = document.getElementsByTagName('*')
+  for (let i = 0; i < elements.length; i++) {
+    const zIndex = window.getComputedStyle(elements[i]).zIndex
+    if (!isNaN(zIndex)) {
+      maxZ = Math.max(maxZ, parseInt(zIndex, 10))
+    }
+  }
+  return maxZ || 2001
+}
+
 export function modalPromise(comp, defaultConfig, mountedEl) {
   return (config, removable = true) => {
     return new Promise((resolve, reject) => {
       const props = Object.assign({}, defaultConfig, config)
+      const maxZ = getMaxZIndex()
       const vm = createVNode(comp, {
         ...props,
+        zIndex: maxZ,
         onCancel: onCancel(reject),
         onConfirm: onConfirm(resolve, removable)
       }, null)

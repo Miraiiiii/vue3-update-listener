@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-05-13 11:08:34
+ * @LastEditTime: 2024-08-21 15:39:37
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -33,6 +33,7 @@ const ListenVersion = {
     let isStop = false
 
     if (options.refreshSameOrigin) {
+      localStorage.removeItem('refreshPage')
       window.addEventListener('storage', function(event) {
         if (event.key === 'refreshPage' && event.newValue === 'true') {
           localStorage.removeItem('refreshPage')

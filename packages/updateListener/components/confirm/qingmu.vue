@@ -3,10 +3,10 @@
  * @Author: 舌红
  * @Date: 2024-02-19 11:59:50
  * @LastEditors: 舌红
- * @LastEditTime: 2024-02-23 14:44:36
+ * @LastEditTime: 2024-08-21 16:07:12
 -->
 <template>
-  <ConfirmMask>
+  <ConfirmMask :z-index="zIndex">
     <div class="confirm-qingmu__body">
       <div class="confirm-qingmu__wrapper">
         <div class="confirm-qingmu__title">
