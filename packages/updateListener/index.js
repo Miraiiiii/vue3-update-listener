@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-10-18 15:34:14
+ * @LastEditTime: 2024-10-18 16:34:36
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -63,34 +63,38 @@ const ListenVersion = {
     // 停止检查更新
     const stopUpdate = () => {
       if (setInterValId) {
-        console.log('停止检查更新')
         clearInterval(setInterValId)
         setInterValId = ''
       }
     }
 
     const handleListen = async () => {
+      stopUpdate()
       isUpdate = options.showTest || (await checkUpdate())
       // 判断versionInfo.message是否有--no-tip字符，如果有则不提示更新
       if (isUpdate || options.showTest) {
-        console.log('有新版本')
         stopUpdate()
         await callConfirm()
+      } else {
+        setListenInterval()
       }
     }
 
     // 开始检查更新
     const startListen = async (immediate = false) => {
       if (!options.showTest && (options.isTip === false || isStop)) return
-      const versionInfo = await getVersion()
-      if (!versionInfo || isUpdate) return
-      if (!immediate) {
+      if (immediate) {
+        await handleListen()
+      } else {
+        const versionInfo = await getVersion()
+        if (!versionInfo || isUpdate) return
         currebtVersion = versionInfo.commitHash
-        console.log('当前版本：', currebtVersion)
+        setListenInterval()
       }
-      immediate && await handleListen()
-      console.log('开始检查更新')
-      setInterValId = setInterval(async () => (await handleListen()), options.interval || 5 * 60 * 1000)
+    }
+
+    const setListenInterval = () => {
+      setInterValId = setInterval(handleListen, options.interval || 5 * 60 * 1000)
     }
 
     const callConfirm = async () => {
