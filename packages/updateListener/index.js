@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-10-18 16:34:36
+ * @LastEditTime: 2024-11-13 16:29:05
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -27,7 +27,8 @@ import { openConfirm } from './components/confirm/confirm'
 
 const ListenVersion = {
   install(Vue, options) {
-    let currebtVersion
+    let currentVersion
+    let newVersion
     let setInterValId
     let isUpdate = false
     let isStop = false
@@ -56,8 +57,9 @@ const ListenVersion = {
     const checkUpdate = async () => {
       const currentVersionInfo = await getVersion()
       const commitHash = currentVersionInfo.commitHash
+      newVersion = commitHash
       console.log('当前版本：', commitHash)
-      return commitHash !== currebtVersion && currentVersionInfo.isTip
+      return commitHash !== currentVersion && currentVersionInfo.isTip
     }
 
     // 停止检查更新
@@ -88,7 +90,8 @@ const ListenVersion = {
       } else {
         const versionInfo = await getVersion()
         if (!versionInfo || isUpdate) return
-        currebtVersion = versionInfo.commitHash
+        currentVersion = versionInfo.commitHash
+        newVersion = currentVersion
         setListenInterval()
       }
     }
@@ -114,6 +117,7 @@ const ListenVersion = {
         }
       } catch (error) {
         console.log(error)
+        currentVersion = newVersion
       }
     }
 
@@ -128,13 +132,18 @@ const ListenVersion = {
     document.addEventListener('visibilitychange', listenPageVisible)
 
     const listenJSError = async (event) => {
-      if (event.target && event.target.nodeName === 'SCRIPT') {
+      if (event.target && event.target.nodeName === 'SCRIPT' && options.isTip) {
         const scriptUrl = event.target.src
         console.error('Failed to load script: ' + scriptUrl)
-        stopUpdate()
-        await callConfirm()
+
+         // 检查是否是构建版本差异导致的错误
+         if (event.message && event.message.includes('unexpected token')) {
+          console.warn('可能由于构建版本差异导致的错误')
+          stopUpdate()
+          await callConfirm()
+        }
       }
-    }  
+    } 
 
     if (options.isListenJSError) {
       window.addEventListener('error', listenJSError)
