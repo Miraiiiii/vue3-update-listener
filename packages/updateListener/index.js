@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-11-13 16:29:05
+ * @LastEditTime: 2024-12-19 17:43:11
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -22,6 +22,7 @@ import { openConfirm } from './components/confirm/confirm'
  * @param {String} options.type 弹窗样式类型，默认为'qingmu', 可选值为'element'、'qingmu'、'custom'(暂不支持)
  * @param {Boolean} options.showTest 弹窗常显测试
  * @param {Boolean} options.refreshSameOrigin 是否刷新同源页面，默认为true
+ * @param {Boolean} options.disabledTimer 是否禁用定时器，默认为false
  * @returns {Void} 无返回值
  */
 
@@ -78,7 +79,9 @@ const ListenVersion = {
         stopUpdate()
         await callConfirm()
       } else {
-        setListenInterval()
+        if (!options.disabledTimer) {
+          setListenInterval()
+        }
       }
     }
 
@@ -92,7 +95,9 @@ const ListenVersion = {
         if (!versionInfo || isUpdate) return
         currentVersion = versionInfo.commitHash
         newVersion = currentVersion
-        setListenInterval()
+        if (!options.disabledTimer) {
+          setListenInterval()
+        }
       }
     }
 

@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-10 16:16:52
  * @LastEditors: 舌红
- * @LastEditTime: 2024-04-28 17:11:07
+ * @LastEditTime: 2024-12-19 17:42:57
  */
 import ListenerLoader from "./updateListener/index.js"
 import './updateListener/theme-chalk/index.scss'
@@ -22,6 +22,7 @@ import './updateListener/theme-chalk/index.scss'
  * @param {String} options.type 弹窗样式类型，默认为'qingmu', 可选值为'element'、'qingmu'、'custom'(暂不支持)
  * @param {Boolean} options.showTest 弹窗常显测试
  * @param {Boolean} options.refreshSameOrigin 是否刷新同源页面，默认为true
+ * @param {Boolean} options.disabledTimer 是否禁用定时器，默认为false
  * @returns {Void} 无返回值
  */
 
