@@ -1,6 +1,6 @@
 {
   "name": "vue3-update-listener",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "description": "这是一个简易的vue组件，用于监听项目构建的更新事件，当新版本构建成功更新时，会弹出一个提示框，提示用户是否刷新页面",
   "main": "lib/vue3-update-listener.umd.min.js",
   "private": false,

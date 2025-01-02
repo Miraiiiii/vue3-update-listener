@@ -3,7 +3,7 @@
  * @Author: 舌红
  * @Date: 2024-01-09 17:38:09
  * @LastEditors: 舌红
- * @LastEditTime: 2024-12-19 17:43:11
+ * @LastEditTime: 2024-12-20 16:14:10
  */
 
 import { openConfirm } from './components/confirm/confirm'
@@ -46,7 +46,8 @@ const ListenVersion = {
 
     // 获取版本信息
     const getVersion = async () => {
-      return fetch(`${options.versionUrl || '/dist'}/version.json?timeStamp=` + Date.now()).then(res => {
+      const userId = localStorage.getItem('userId')
+      return fetch(`${options.versionUrl || '/dist'}/version.json?userId=${userId || 0}&timeStamp=` + Date.now()).then(res => {
         return res.json()
       }).catch(err => {
         console.warn('获取version.json文件失败，请检查路径是否正确')
